@@ -38,14 +38,50 @@ window.onload = function () {
     .attr("x", 200)
     .attr("y", 50)
     .attr("width", 100)
-    .attr("height", 20)
-    .attr("fill", "black");
+    .attr("height", function(d, i) { return (yPeople(peopleArray[1]) - yPeople(peopleArray[0])) - 5})
+    .attr("fill", "black")
+    .on("mouseover", function () {
+      d3.selectAll("rect." + this.className.baseVal)
+        .transition()
+        .attr("fill", "#0da4d3")
+        .duration(500);
+      d3.selectAll("path." + this.className.baseVal)
+        .transition()
+        .style("stroke", "#0da4d3")
+        .duration(500);
+      var thisPaths = d3.selectAll("path." + this.className.baseVal)._groups[0];
+      for (var i = 0; i < thisPaths.length; i++) {
+        var thisStrength = thisPaths[i].classList[1];
+        d3.selectAll("text." + thisStrength)
+          .transition()
+          .style("fill", "#0da4d3")
+          .duration(500);
+      }
+    })
+    .on("mouseout", function () {
+      d3.selectAll("rect." + this.className.baseVal)
+        .transition()
+        .attr("fill", "black")
+        .duration(500);
+      d3.selectAll("path." + this.className.baseVal)
+        .transition()
+        .style("stroke", "gray")
+        .duration(500);
+      var thisPaths = d3.selectAll("path." + this.className.baseVal)._groups[0];
+      for (var i = 0; i < thisPaths.length; i++) {
+        var thisStrength = thisPaths[i].classList[1];
+        d3.selectAll("text." + thisStrength)
+          .transition()
+          .style("fill", "black")
+          .duration(500);
+      }
+    });
 
   var text = rectGroup.append("text")
     .text(function(d, i) { return d.name; })
     .attr("x", 210)
     .attr("y", 50)
-    .attr("dy", 15)
+    .attr("dy", 20)
     .style("fill", "white");
 
   var strengthsDiv = svg.append("g").attr("id", "strengths");
@@ -66,6 +102,7 @@ window.onload = function () {
 
   var textStr = textStrengths.append("text")
     .text(function(d) {return d.theme})
+    .attr("class", function(d, i) { return d.theme; })
     .attr("x", width - 200)
     .attr("y", 50)
     .style("fill", "black");
@@ -88,10 +125,14 @@ window.onload = function () {
     .attr("class", function(d) {return d});
 
   var counter = 0;
+  var counter1 = 0;
 
   var connectLine = specificStrengthsGroup.append("path")
+    .attr("class", function(d) {
+      counter1++;
+      return "" + peopleArray[Math.round((counter1-3) / 5)] + " " + d
+    })
     .attr("d", function (d, i) {
-      console.log(yPeople(peopleArray[Math.round((counter-2) / 5)]));
       counter++;
       return "M 300 " +
         (60 + yPeople(peopleArray[Math.round((counter - 3) / 5)])) +
